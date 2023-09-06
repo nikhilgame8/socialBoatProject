@@ -1,23 +1,28 @@
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import './App.css';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import Loader from './Components/Loader';
+import VideoCard from './Components/VideoCard';
+import SearchBar from './Components/SearchBar';
 
 function App() {
 
   const [videosData, setVideosData] = useState([]);
   const [searchVideo, setSearchVideo] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // useEffect(() => {
   //   handleSearch("abs", 10);
   // }, []);
 
   const handleSearch = async (query, numResults) => {
+    setLoading(true);
     try {
       const response = await axios.get('https://asia-south1-socialboat-dev.cloudfunctions.net/assignmentVideos', {
         params: {
           q: query,
-          numResults: numResults,
+          numResults: 20,
         },
       });
 
@@ -25,44 +30,38 @@ function App() {
       // Update your component state with the fetched videos
 
       setVideosData(videos.results)
+      setSearchVideo("");
       console.log(videos)
     } catch (error) {
       console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleSearchByEnter = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch(searchVideo, 10); // Calling your video search function here
     }
   };
 
-
   return (
-    <div style={{ width: "100vw" }}>
+    <div>
       <div className='container'>
-        <div className='search-div'>
-          <div className='search-container'>
-            <input type='search' className='search-input' value={searchVideo} onChange={(e) => setSearchVideo(e.target.value)} placeholder='Search your video' />
-            <button type='button' className='search-button' onClick={() => handleSearch(searchVideo, 10)}>Search</button>
-          </div>
-        </div>
-        <div className='videos-container'>
-          {videosData.map((video, index) => (
-            <div key={index} className="video-card">
-              <video controls width="100%">
-                <source src={video.video} type="video/mp4" />
-                <source src={video.video} type="video/webm" />
-                <source src={video.video} type="video/ogg" />
-                Your browser does not support the video tag.
-              </video>
-              <h3>{video.heading}</h3>
-              <p className='video-description'>{video.text}</p>
-              {/* <div>{video.video}</div> */}
-              <div className='video-tag-container'>
-                {
-                  video.tags.map((tag, tagIndex) => (
-                    <div className='video-tag' onClick={() => handleSearch(tag, 10)}>{tag}</div>
-                  ))
-                }
+        <SearchBar searchVideo={searchVideo} handleSearch={handleSearch} handleSearchByEnter={handleSearchByEnter} setSearchVideo={setSearchVideo} />
+        <section className='view-section'>
+          {
+            loading ?
+              <Loader />
+              :
+              <div className='videos-container'>
+                {videosData.map((video, index) => (
+                  <div key={index}>
+                    <VideoCard video={video} handleSearch={handleSearch} />
+                  </div>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
+          }
+        </section>
       </div>
     </div>
   );
