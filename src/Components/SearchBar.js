@@ -4,7 +4,11 @@ const SearchBar = ({ searchVideo, handleSearchByEnter, setSearchVideo, handleSea
     return (
         <div className='search-div'>
             <div className='search-container'>
-                <input type='search' className='search-input' value={searchVideo} onKeyDown={handleSearchByEnter} onChange={(e) => setSearchVideo(e.target.value)} placeholder='Search your video' />
+                <input type='search' className='search-input' value={searchVideo} onKeyDown={handleSearchByEnter}
+                    onChange={(e) => {
+                        setSearchVideo(e.target.value);
+                        handleSearch(e.target.value, 10)
+                    }} placeholder='Search your video' />
                 <button type='button' className='search-button' onClick={() => handleSearch(searchVideo, 10)}>Search</button>
             </div>
         </div>

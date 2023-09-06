@@ -5,6 +5,9 @@ import { useState } from 'react';
 import Loader from './Components/Loader';
 import VideoCard from './Components/VideoCard';
 import SearchBar from './Components/SearchBar';
+import Navbar from './Components/Navbar';
+import { useLottie } from "lottie-react";
+import workoutAnimation from "./workoutAnimation.json";
 
 function App() {
 
@@ -30,10 +33,11 @@ function App() {
       // Update your component state with the fetched videos
 
       setVideosData(videos.results)
-      setSearchVideo("");
+      // setSearchVideo("");
       console.log(videos)
     } catch (error) {
-      console.error('Error fetching data:', error);
+      // console.error('Error fetching data:', error);
+      setVideosData([]);
     } finally {
       setLoading(false);
     }
@@ -44,8 +48,19 @@ function App() {
     }
   };
 
+  const options = {
+    animationData: workoutAnimation,
+    loop: true
+  };
+
+  const { View } = useLottie(options);
+
   return (
     <div>
+      <Navbar />
+      <div className='background-animation'>
+        {View}
+      </div>
       <div className='container'>
         <SearchBar searchVideo={searchVideo} handleSearch={handleSearch} handleSearchByEnter={handleSearchByEnter} setSearchVideo={setSearchVideo} />
         <section className='view-section'>
